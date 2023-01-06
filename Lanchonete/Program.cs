@@ -19,9 +19,32 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+// Politica do identity para criação de usuário
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 3;
+    options.Password.RequiredUniqueChars = 1;
+});
+
+
 builder.Services.AddTransient<ILancheRepository, LancheRepository>();
 builder.Services.AddTransient<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddTransient<IPedidoRepository, PedidoRepository>();
+
+builder.Services.AddScoped<ISeedUserRoleInitial, SeedUserRoleInitial>();
+
+builder.Services.AddAuthorization(opt =>
+{
+    opt.AddPolicy("Admin", policy =>
+    {
+        policy.RequireRole("Admin");
+    });
+});
+
 
 builder.Services.AddScoped(sp => CarrinhoCompra.GetCarrinho(sp));
 
@@ -38,8 +61,17 @@ builder.Services.AddSession();
 
 var app = builder.Build();
 
+var seederUsers = app.Services.GetService<IServiceScopeFactory>().CreateScope();
+
+var startSeeders = seederUsers.ServiceProvider.GetRequiredService<ISeedUserRoleInitial>();
+
+startSeeders.SeedRoles();
+startSeeders.SeedUsers();
+
 app.UseSession();
-app.UseAuthorization();
+
+app.UseAuthentication();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -56,6 +88,11 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+
+app.MapControllerRoute(
+      name: "areas",
+      pattern: "{area:exists}/{controller=Admin}/{action=Index}/{id?}"
+    );
 
 app.MapControllerRoute(
     name: "categoriaFiltro",
