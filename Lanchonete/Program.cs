@@ -8,6 +8,7 @@ using Lanchonete.Servicos.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ReflectionIT.Mvc.Paging;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,7 @@ builder.Services.AddTransient<IPedidoRepository, PedidoRepository>();
 
 builder.Services.AddScoped<ISeedUserRoleInitial, SeedUserRoleInitial>();
 
+
 builder.Services.AddAuthorization(opt =>
 {
     opt.AddPolicy("Admin", policy =>
@@ -58,6 +60,7 @@ builder.Services.AddTransient<IPedidoService, PedidoService>();
 //todo o certo é ter interface
 builder.Services.AddScoped<RelatorioVendasService>();
 
+builder.Services.Configure<ConfigurationImagens>(builder.Configuration.GetSection("ConfigurationsImagens"));
 
 builder.Services.AddMemoryCache();
 builder.Services.AddSession();
@@ -71,6 +74,8 @@ builder.Services.AddPaging(option =>
 
 
 var app = builder.Build();
+
+
 
 var seederUsers = app.Services.GetService<IServiceScopeFactory>().CreateScope();
 
