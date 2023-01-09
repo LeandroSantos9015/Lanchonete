@@ -1,3 +1,4 @@
+using Lanchonete.Areas.Admin.Services;
 using Lanchonete.Context;
 using Lanchonete.Models;
 using Lanchonete.Repositories;
@@ -53,6 +54,9 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<ILancheService, LancheService>();
 builder.Services.AddTransient<ICategoriaService, CategoriaService>();
 builder.Services.AddTransient<IPedidoService, PedidoService>();
+
+//todo o certo é ter interface
+builder.Services.AddScoped<RelatorioVendasService>();
 
 
 builder.Services.AddMemoryCache();
