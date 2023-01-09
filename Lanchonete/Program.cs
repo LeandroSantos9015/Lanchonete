@@ -6,6 +6,7 @@ using Lanchonete.Servicos;
 using Lanchonete.Servicos.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using ReflectionIT.Mvc.Paging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,6 +58,12 @@ builder.Services.AddTransient<IPedidoService, PedidoService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddSession();
 //builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddPaging(option =>
+{
+    option.ViewName = "Bootstrap4";
+    option.PageParameterName = "pageindex";
+});
 
 
 var app = builder.Build();
